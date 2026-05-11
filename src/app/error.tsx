@@ -12,9 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Surface unexpected errors during dev; production should ship to a logger.
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
       console.error(error);
     }
   }, [error]);
