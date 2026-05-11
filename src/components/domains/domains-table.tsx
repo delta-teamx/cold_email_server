@@ -1,6 +1,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -32,6 +33,9 @@ export function DomainsTable({ domains }: Props) {
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
+        <TableCaption className="sr-only">
+          Sending domains with their DNS configuration status and inbox counts.
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Domain</TableHead>

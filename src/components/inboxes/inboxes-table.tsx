@@ -1,6 +1,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -19,6 +20,9 @@ export function InboxesTable({ inboxes }: { inboxes: InboxRow[] }) {
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
+        <TableCaption className="sr-only">
+          Sending inboxes with their current state, daily sends, and limits.
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Inbox</TableHead>

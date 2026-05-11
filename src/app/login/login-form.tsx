@@ -17,8 +17,15 @@ export function LoginForm() {
 
   if (state.ok) {
     return (
-      <div className="rounded-lg border border-border bg-card p-6 text-center">
-        <MailCheck className="mx-auto mb-3 size-8 text-emerald-500" />
+      <div
+        role="status"
+        aria-live="polite"
+        className="rounded-lg border border-border bg-card p-6 text-center"
+      >
+        <MailCheck
+          aria-hidden="true"
+          className="mx-auto mb-3 size-8 text-emerald-500"
+        />
         <p className="font-medium">Check your inbox.</p>
         <p className="mt-1 text-sm text-muted-foreground">
           We sent you a magic link. Click it to finish signing in.
@@ -42,8 +49,11 @@ export function LoginForm() {
         />
       </div>
       {state.error ? (
-        <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+        >
+          <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           <span>{state.error}</span>
         </div>
       ) : null}

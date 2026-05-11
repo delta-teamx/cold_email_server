@@ -31,12 +31,15 @@ export function AppSidebar() {
   return (
     <aside className="hidden w-60 shrink-0 border-r border-sidebar-border bg-sidebar md:flex md:flex-col">
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-        <div className="flex size-7 items-center justify-center rounded-md bg-foreground text-background">
+        <div
+          aria-hidden="true"
+          className="flex size-7 items-center justify-center rounded-md bg-foreground text-background"
+        >
           <span className="text-xs font-bold">O</span>
         </div>
         <span className="text-sm font-semibold">Outreach</span>
       </div>
-      <nav className="flex-1 space-y-0.5 p-2">
+      <nav aria-label="Primary" className="flex-1 space-y-0.5 p-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active =
             pathname === href || pathname.startsWith(`${href}/`);
@@ -44,14 +47,15 @@ export function AppSidebar() {
             <Link
               key={href}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
               )}
             >
-              <Icon className="size-4" />
+              <Icon aria-hidden="true" className="size-4" />
               {label}
             </Link>
           );
