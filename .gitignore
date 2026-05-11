@@ -1,0 +1,31 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env*.local
+
+*.log
+.DS_Store
+
+.vercel
+.turbo
+
+# Supabase
+supabase/.branches
+supabase/.temp
+supabase/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# TS
+*.tsbuildinfo
+next-env.d.ts
