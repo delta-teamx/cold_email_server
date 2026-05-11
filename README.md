@@ -130,20 +130,71 @@ curl -i http://localhost:3000/api/cron/promote-inboxes \
 
 ---
 
-## What's in Phase 1
+## Scraping leads from Google Maps
+
+The scraper is a standalone Node CLI — it launches Chromium via Playwright, walks the search results, and inserts unique leads via the service-role key. It never runs inside Next; Vercel function timeouts (60s) would kill a real scrape mid-run.
+
+### Install the browser binary once
+
+```bash
+npx playwright install chromium
+```
+
+(Adds ~150MB to your dev machine — only needed where you'll actually run the scraper.)
+
+### Run a scrape
+
+Auto-create a campaign and populate it:
+
+```bash
+npm run scrape -- --niche "Dentists" --city "Phoenix" --limit 100
+```
+
+Or target an existing campaign:
+
+```bash
+npm run scrape -- --campaign 9d3a... --limit 200 --delay 2000
+```
+
+Flags:
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--campaign <uuid>` | — | Existing campaign id (skip auto-create) |
+| `--niche <text>` `--city <text>` | — | Required when no `--campaign` |
+| `--name <text>` | `"$niche in $city"` | Display name for the auto-created campaign |
+| `--limit <n>` | 100 | Cap on businesses extracted |
+| `--delay <ms>` | 1500 | Pause between detail visits (be respectful) |
+| `--headed` | off | Run with a visible browser to debug selectors |
+
+### Expected behavior
+
+- Saves the campaign id first so a partial scrape doesn't lose progress.
+- Inserts leads in chunks of 50 with `upsert` on `email` so re-running is safe.
+- If Google serves a `/sorry/`, CAPTCHA, or consent gate, the run aborts cleanly and saves whatever it managed to pull.
+- Selectors in `src/lib/scraper/google-maps.ts` target stable ARIA attributes (`button[data-item-id="address"]`, etc.) — Google changes these occasionally; tune them when you see fields coming back as null.
+
+### When to use a paid SERP API instead
+
+Self-hosted scraping breaks under sustained load. For >1k leads/day, swap in SerpAPI or Apify by replacing `scrapeGoogleMaps()` with a call to their API and reusing the same `normalize.ts` pipeline downstream.
+
+---
+
+## What's in Phases 1–2
 
 - ✅ Next.js 15 + Tailwind v4 + shadcn/ui (dark by default).
 - ✅ Supabase clients: server (RSC + handlers), browser, service-role, middleware refresh.
 - ✅ Magic-link auth with `ADMIN_EMAIL` allowlist enforced at request, callback, middleware, and every route handler.
 - ✅ Full schema migration (`supabase/migrations/0001_init.sql`) with enums, RLS, the 3-inboxes-per-domain trigger, `updated_at` triggers.
 - ✅ Dashboard shell with sidebar (Domains · Inboxes · Campaigns · Leads · Call Engine · Inbox · Pipeline · Settings).
-- ✅ Domains: create / DKIM-SPF-DMARC toggle / delete; status auto-derived (`pending` / `configured` / `active`).
-- ✅ Inboxes: create (attached to a domain), state machine badge, manual pause/resume, start warmup clock, delete.
-- ✅ Cron endpoint that idempotently promotes inboxes.
+- ✅ Domains: create / DKIM-SPF-DMARC toggle / delete; status auto-derived.
+- ✅ Inboxes: create, state badge, pause/resume, start warmup clock, cron-driven promotion.
+- ✅ Campaigns: full CRUD with status workflow and lead counts.
+- ✅ Leads: paginated list with q/campaign/status/call_status filters, lead detail page.
+- ✅ Google Maps scraper CLI with normalization, dedupe, and block-detection.
 
 ## Coming next
 
-- **Phase 2:** Playwright scraper + lead management.
 - **Phase 3:** Twilio Call Engine + TCPA windowing.
 - **Phase 4:** Claude personalizer + Instantly integration + volume governor.
 - **Phase 5:** IMAP reply listener + unified inbox + Kanban pipeline.
@@ -159,6 +210,9 @@ curl -i http://localhost:3000/api/cron/promote-inboxes \
 | `npm start`       | Run the production build |
 | `npm run lint`    | Next/ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm test`        | Run vitest suite once |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run scrape`  | CLI: scrape Google Maps into a campaign (see Scraping section) |
 | `npm run db:reset`  | Reset local Supabase + re-apply migrations |
 | `npm run db:types`  | Regenerate `src/types/database.ts` from local schema |
 | `npm run db:push`   | Push migrations to linked cloud project |
